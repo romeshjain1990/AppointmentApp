@@ -1,0 +1,49 @@
+<h1>Appointment App</h1>
+<hr />
+<div>Select Working Days</div>
+<br />
+<div *ngFor="let day of weekDays; let i = index">
+  <input
+    type="checkbox"
+    name="{{ day }}"
+    [checked]="preSelectedWeekDays.indexOf(day) > -1"
+    (change)="daySelectionChanged(day, $event.target.checked)"
+  />
+  {{ day }}
+</div>
+<hr />
+<button
+  [disabled]="currentWeek < 1"
+  (click)="currentWeek = currentWeek - 1; getAppointments()"
+>
+  Previous Week
+</button>
+<button (click)="currentWeek = currentWeek + 1; getAppointments()">
+  Next Week
+</button>
+<hr />
+<table>
+  <tr>
+    <th>Day Number</th>
+    <th *ngFor="let day1 of week">{{ day1.date }}</th>
+  </tr>
+  <tr *ngFor="let slot of slots; let slotNumber = index">
+    <td>{{ slot | date : "hh:mm" }}</td>
+    <td *ngFor="let day1 of week; let dayNumber = index">
+      <div
+        *ngIf="
+          preSelectedWeekDays.indexOf(weekDays[day1.weekDay]) > -1;
+          else notAvailable
+        "
+      >
+        <div *ngIf="hasAppointment(fullWeekAppointments[dayNumber][slotNumber]); else bookAppointmentTemplate">
+          Already Booked
+        </div>
+      </div>
+      <ng-template #bookAppointmentTemplate>
+        <button (click)="bookAppointment(fullWeekAppointments[dayNumber][slotNumber])">Book Appointment</button>
+      </ng-template>
+      <ng-template #notAvailable>Doctor Not Available</ng-template>
+    </td>
+  </tr>
+</table>
